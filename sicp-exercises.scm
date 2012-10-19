@@ -911,3 +911,75 @@ guess: 4.5555465521473675
 ; pi / 6 = 0.52359877
 (tan-cf 0.52359877 1000) ; tan(pi/6) == 0.5773502 == sqrt(3)/3
 
+; page 110 avg damping
+(define (square x) (* x x))
+(define (average x y) (/ (+ x y) 2))
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+((average-damp square) 10) ; 55
+
+; exercise 1.40
+(define (deriv g)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x))
+       dx)))
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) ((deriv g) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+(define (cubic a b c)
+  (lambda (x) (+ (cube x) (* (square x) a) (* x b) c)))
+
+; to be used for example like this:
+(define (cubic-root a b c)
+  (newtons-method (cubic a b c) 1))
+
+; exercise 1.41
+(define (double f)
+  (lambda (x) (f (f x))))
+
+(define (inc x)
+  (+ x 1))
+
+(define (add-two x)
+  ((double inc) x))
+
+(((double (double double)) inc) 5) ; 21
+
+(((double double) inc) 1) ; 5
+(((double double) inc) 2) ; 6
+(((double double) inc) 3) ; 7
+(((double double) inc) 4) ; 8
+(((double double) inc) 5) ; 9
+
+(((double (double double)) inc) 1) ; 17
+(((double (double double)) inc) 2) ; 18 
+(((double (double double)) inc) 3) ; 19
+(((double (double double)) inc) 4) ; 20
+(((double (double double)) inc) 5) ; 21
+(((double (double double)) inc) 6) ; 22
+
+; exercise 1.42
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+((compose square inc) 6) ; 49
+
+; exercise 1.43
+(define (repeated f n)
+  (define (helper g a)
+    (if (= a 1)
+        g
+	(compose g (helper g (- a 1)))))
+  (lambda (x)
+    ((helper f n) x)))
+
+(repeated f 3)
+(compose g (helper g 2))
+(compose g (compose g (helper g 1)))
+(compose g (compose g g))
