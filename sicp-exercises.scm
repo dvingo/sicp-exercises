@@ -1095,3 +1095,131 @@ guess: 4.5555465521473675
 (define (new-sqrt guess x)
   ((iterative-improve good-enough? improve) guess x))
   
+; Chapter 2
+
+; cons stands for construct.  The names car and cdr derive from the original 
+; implementation of Lisp on the IBM 704.  That machine had an addressing scheme
+; that allowed one to reference the "address" and "decrement" parts of a
+; memory loction.  Car stands for "Contents of Address part of Register"
+; and cdr (pronounced "could-er") stands for "Contents of Decrement part of
+; Register."
+
+; exercise 2.1
+(define (make-rat n d)
+  (let ((g (gcd n d)))
+    (cond ((and (negative? n) (negative? d))
+	   (cons (/ (* -1 n) g) (/ (* -1 d) g)))
+	  ((and (negative? n) (positive? d))
+	   (cons (/ n g) (/ d g)))
+	  ((and (positive? n) (negative? d))
+	   (cons (/ (* -1 n) g) (/ (* -1 d) g)))
+	  (else (cons (/ n g) (/ d g))))))
+
+; exercise 2.2
+(define (make-segment p1 p2)
+  (cons p1 p2))
+
+(define (start-segment seg)
+  (car seg))
+
+(define (end-segment seg)
+  (cdr seg))
+
+(define (make-point x y)
+  (cons x y))
+
+(define (x-point point)
+  (car point))
+
+(define (y-point point)
+  (cdr point))
+
+(define (midpoint-segment line-segment)
+  (let ((x1 (x-point (start-segment line-segment)))
+	(x2 (x-point (end-segment line-segment)))
+	(y1 (y-point (start-segment line-segment)))
+	(y2 (y-point (end-segment line-segment))))
+	(make-point 
+	 (/ (+ x1 x2) 2)
+	 (/ (+ y1 y2) 2))))
+
+(define (print-point p)
+         (newline)
+         (display "(")
+         (display (x-point p))
+         (display ",")
+         (display (y-point p))
+         (display ")"))
+
+(define p1 (make-point 4 4))
+(define p2 (make-point 8 8))
+
+(define seg (make-segment (make-point 4 4) (make-point 8 8)))
+
+(print-point (make-point (/ (+ 4 8) 2) (/ (+ 4 8) 2)))
+
+; exercise 2.3
+
+; takes two points top-left and bottom-right
+(define (make-rec top-left bottom-right)
+  (cons (cons top-left 
+	(make-point (x-point bottom-right) (y-point top-left)))
+	(cons (make-point (x-point top-left) (y-point bottom-right))
+	      (make-point (x-point bottom-right) (y-point bottom-right)))))
+
+(make-rec (make-point 2 4) (make-point 4 0))
+
+; four points of the rectangle
+(define (tl rec)
+  (car (car rec)))
+(define (tr rec)
+  (cdr (car rec)))
+(define (bl rec)
+  (car (cdr rec)))
+(define (br rec)
+  (cdr (cdr rec)))
+
+; version 2:
+(define (make-rec top-segment left-segment)
+  (cons top-segment left-segment))
+
+(define top-segg (make-segment (make-point 2 4) (make-point 4 4)))
+(define left-segg (make-segment (make-point 2 4) (make-point 2 0)))
+
+(define my-rec (make-rec top-segg left-segg))
+
+(define (tl rec)
+  (start-segment (car rec)))
+(define (tr rec)
+  (end-segment (car rec)))
+(define (bl rec)
+  (end-segment (cdr rec)))
+(define (br rec)
+  (make-segment (x-point (end-segment (car rec)))
+		(y-point (end-segment (cdr rec)))))
+  
+(define (top-seg rec)
+  (make-segment (tl rec) (tr rec)))
+(define (bot-seg rec)
+  (make-segment (bl rec) (br rec)))
+(define (left-seg rec)
+  (make-segment (tl rec) (bl rec)))
+(define (right-seg rec)
+  (make-segment (tr rec) (br rec)))
+(define (square x) (* x x))
+(define (length segment)
+  (let ((x1 (x-point (start-segment segment)))
+	(x2 (x-point (end-segment segment)))
+	(y1 (y-point (start-segment segment)))
+	(y2 (y-point (end-segment segment))))
+    (sqrt (+ (square (- x2 x1)) (square (- y2 y1))))))
+
+(define (rect-perimeter rec)
+  (+ (length (top-seg rec))
+     (length (bot-seg rec))
+     (length (left-seg rec))
+     (length (right-seg rec))))
+
+(define (rect-area rec)
+  (* (length (top-seg rec))
+     (length (left-seg rec))))
