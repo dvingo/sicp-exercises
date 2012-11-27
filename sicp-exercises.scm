@@ -367,6 +367,7 @@ steps? exponential
 (smallest-divisor 19999): 7
 
 ; exercise 1.22
+; given from the text:
 (define (timed-prime-test n)
   (newline)
   (display n)
@@ -383,8 +384,34 @@ steps? exponential
 	((timed-prime-test start)
 	 (search-for-primes (+ start 2) end))))
 
+; runtime doesn't work on mit-scheme
+; (search-for-primes 10000000001 10000000501))
+10000000019 *** .17999999999999972
+10000000033 *** .18000000000000016
+10000000061 *** .18999999999999995
+
+(search-for-primes 100000000001 100000000501))
+;(sqrt 100000000001) == 316227.76601841906
+100000000003 *** .5700000000000003
+100000000019 *** .5700000000000003
+100000000057 *** .5800000000000001
+
+; I'm not sure runtime works as suggested in the text in mit-scheme
+
 ; exercise 1.23
-; for 1.24 and 1.25 need to get a working timed-prime-test
+; for 1.24 need a working runtime function
+
+; exercise 1.25
+; from the text:
+(define (fast-expt b n)
+  (cond ((= n 0) 1)
+	((even? n) (square (fast-expt b (/ n 2))))
+	(else (* b (fast-expt b (- n 1))))))
+The difference lies in the fact that we take the remainder of the successive square or
+mulitplication each time through the recursion, and thus we are dealing with
+numbers that must be smaller than m each time through the recursion.  Whereas
+In fast-expt we don't use this trick.
+
 
 ; exercise 1.26
 The change is that 2 calls are made to expmod instead of just one which
@@ -402,28 +429,45 @@ gets rid of the logarithmic performance.
 
 (define (expmod base exp m)
   (cond ((= exp 0) 1)
-	((even? exp) (remainder (square (expmod base (/ exp 2) m)) m))
-	(else (remainder (* base (expmod base (- exp 1) m)) m))))
+	((even? exp) 
+	 (remainder (square (expmod base (/ exp 2) m)) 
+		    m))
+	(else 
+	 (remainder (* base (expmod base (- exp 1) m))
+		    m))))
 
 ; exercise 1.28
-
-(define (expmod base exp m)
+; non-trivial expmod
+(define (expmod-nt base exp m)
   (cond ((= exp 0) 1)
-	((or (= base 1) (= base (- m 1))) 0)
-	((even? exp) (remainder (square (expmod base (/ exp 2) m)) m))
+	((even? exp)
+	 (if (and (not (= base 1))
+		  (not (= base (- m 1)))
+		  (= (remainder (square base) m) 1))
+		  0
+		  (remainder (square (expmod base (/ exp 2) m)) m)))
 	(else (remainder (* base (expmod base (- exp 1) m)) m))))
-
-; no idea...
-
-(define (mr-test n)
+; doesn't seem to be working 561 should return #f
+(define (miller-rabin-test n)
   (define (try-it a)
-    (= (expmod a (- n 1) n) a))
+    (if (= (expmod-nt a n n) 0)
+	#f
+	(= (expmod-nt a n n) a)))
   (try-it (+ 1 (random (- n 1)))))
 
+; from the text:
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+
+
+; next section notes:
 ; in general lambda is used to create procedures in the same way as define, except that no name is specified for the procedure.
 (lambda (<formal parameters>) <body>)
 
-like:
+;like:
 
 (lambda (x) (+ x 1))
 (define (plus4 x) (+ x 4)) == (define plus4 (lambda (x) (+ 4 x)))
@@ -1276,3 +1320,240 @@ guess: 4.5555465521473675
 (define (church-add a b)
   (lambda (f) (lambda (x) ((a f) ((b f) x)))))
 ; apply f b times then apply that function a times.
+
+; exercise 2.7
+; from the text:
+(define (make-interval a b) (cons a b))
+
+(define (lower-bound interval) (car interval))
+(define (upper-bound interval) (cdr interval))s
+
+; exercise 2.8
+; the minimum value the difference can be is the difference
+; of the lower bound of a and the upper bound of b
+; the maximum value the difference can be is the differnce
+; of the upper bound of a with the lower bound of b
+; (4 8) (1 3)
+; assumes a is the larger resistance
+(define (sub-interval a b)
+  (make-interval (- (lower-bound a) (upper-bound b))
+		 (- (upper-bount a) (lower-bound b))))
+
+; from the text:
+(define (add-interval x y)
+  (make-interval (+ (lower-bound x) (lower-bound y))
+		 (+ (upper-bound x) (upper-bound y))))
+(define (mul-interval x y)
+  (let ((p1 (* (lower-bound x) (lower-bound y)))
+	(p2 (* (lower-bound x) (upper-bound y)))
+	(p3 (* (upper-bound x) (lower-bound y)))
+	(p4 (* (upper-bound x) (upper-bound y))))
+    (make-interval (min p1 p2 p3 p4)
+		   (max p1 p2 p3 p4))))
+(define (div-interval x y)
+  (mul-interval x
+		(make-interval (/ 1.0 (upper-bound y))
+			       (/ 1.0 (lower-bound y)))))
+
+; exercise 2.9
+(define (width interval)
+  (/ (- (upper-bound interval) (lower-bound interval)) 2))
+
+(define x (make-interval 1.3 3.4))
+(define y (make-interval 2.3 5.8))
+
+(width x) ; 1.0499
+(width y) ; 1.75
+(add-interval x y) ; (3.5999999999999996 . 9.2)
+(width (add-interval x y)) ; 2.8
+(width (mul-interval x y)) ; 8.365
+
+; exercise 2.10
+(define (div-interval x y)
+  (if (or (= (upper-bound y) 0)
+	  (= (lower-bound y) 0)
+	  (and (> (upper-bound y) 0)
+	       (< (lower-bound y) 0)))
+      (error "attempted division by zero!")
+      (mul-interval x
+		    (make-interval (/ 1.0 (upper-bound y))
+				   (/ 1.0 (lower-bound y))))))
+
+(div-interval (make-interval 0 2) x) ; works
+(div-interval x (make-interval -1.2 2)) ; fail!
+(div-interval x (make-interval 0 2)) ; fail!
+(div-interval x (make-interval 0.1 0)) ; fail!
+
+; exercise 2.11
+(define (mul-interval x y)
+  (let ((p1 (* (lower-bound x) (lower-bound y)))
+	(p2 (* (lower-bound x) (upper-bound y)))
+	(p3 (* (upper-bound x) (lower-bound y)))
+	(p4 (* (upper-bound x) (upper-bound y))))
+    (make-interval (min p1 p2 p3 p4)
+		   (max p1 p2 p3 p4))))
+
+(define (print-mm x y)
+  (let ((p1 (* (lower-bound x) (lower-bound y)))
+	(p2 (* (lower-bound x) (upper-bound y)))
+	(p3 (* (upper-bound x) (lower-bound y)))
+	(p4 (* (upper-bound x) (upper-bound y))))
+    (display "p1-p4: ")(display ", ")(display p1)
+    (display ", ")(display p2)(display ", ")(display  p3)(display ", ") (display p4)))
+
+; (print-mm x y)
+; p1-p4: , 2.9899999999999998, 7.54, 7.819999999999999, 19.72
+
+(define a (make-interval -1.3 3.3))
+(define b (make-interval  3.2 3.4))
+(define (positive? x) (> x 0))
+(define (negative? y) (< y 0))
+(define (mul-interval-2 x y)
+  (let ((ub-x (upper-bound x))
+	(lb-x (lower-bound x))
+	(ub-y (upper-bound y))
+	(lb-y (lower-bound y)))
+  (cond ((and (positive? ub-x)
+	      (positive? lb-x)
+	      (positive? ub-y)
+	      (positive? lb-y))
+	 (make-interval (* lb-x lb-y) (* ub-x ub-y)))
+	((and (positive? ub-x)
+	      (positive? lb-x)
+	      (positive? ub-y)
+	      (negative? lb-y))
+	 (make-interval (* lb-x lb-y) (* ub-x ub-y)))
+	((and (positive? ub-x)
+	      (positive? lb-x)
+	      (negative? ub-y)
+	      (negative? lb-y))
+	 (make-interval (* ub-x lb-y) (* lb-x ub-y)))
+	((and (positive? ub-x)
+	      (negative? lb-x)
+	      (positive? ub-y)
+	      (positive? lb-y))
+	 (make-interval (* lb-x ub-y) (* ub-x ub-y)))
+	((and (positive? ub-x)
+	      (negative? lb-x)
+	      (positive? ub-y)
+	      (negative? lb-y))
+	 (make-interval (max (* lb-x ub-y) (* ub-x lb-y))
+			(max (* ub-x ub-y) (* lb-x lb-y))))
+	((and (positive? ub-x)
+	      (negative? lb-x)
+	      (negative? ub-y)
+	      (negative? lb-y))
+	 (make-interval (* ub-x lb-y) (* lb-x lb-y)))
+	((and (negative? ub-x)
+	      (negative? lb-x)
+	      (positive? ub-y)
+	      (positive? lb-y))
+	 (make-interval (* lb-x ub-y) (* ub-x lb-y)))
+	((and (negative? ub-x)
+	      (negative? lb-x)
+	      (positive? ub-y)
+	      (negative? lb-y))
+	 (make-interval (* lb-x ub-y) (* lb-x lb-y)))
+	((and (negative? ub-x)
+	      (negative? lb-x)
+	      (negative? ub-y)
+	      (negative? lb-y))
+	 (make-interval (* ub-x ub-y) (* lb-x lb-y))))))
+	
+
+(mul-interval a b); (-4.42 . 11.2199999999999)
+(mul-interval-2 a b); (-4.42 . 11.2199999999999)
+
+; exercise 2.12
+(define (make-center-width c w)
+  (make-interval (- c w) (+ c w)))
+(define (center i)
+  (/ (+ (lower-bound i) (upper-bound i)) 2))
+(define (width i)
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+(define (make-center-percent center tol)
+  (make-interval (- center tol) (+ center tol)))
+
+(define (percent interval)
+  (/ (width interval) (center interval)))
+
+(define x (make-interval 1.3 3.4))
+(define y (make-interval 2.3 5.8))
+
+(center x); 2.35
+(width x); 1.0499999999999998
+(make-center-width 2.35 1.0499999999999998); (1.3000000000000003 . 3.4)
+(percent x) ;.4468085106382978
+
+;  (/ (width x) (center x))
+;Value: .4468085106382978
+
+; (* .4468 2.35): 1.04998
+
+; (+ 1.04998 2.35) : 3.3999800000000002
+
+; (- 2.35 1.04998) : 1.3000200000000002
+
+; exercise 2.13
+
+(define a (make-center-percent 3 .2))
+(define b (make-center-percent 2 .3))
+(percent (mul-interval a b)); = .2145214521452145
+(define a (make-center-percent 3 .2))
+(define b (make-center-percent 2 .5)); percent: .31147540932606564
+
+; this looks like the approximate percentage tolerance of the product
+; of two intervals is the average of the percentage tolerances of the factors.
+(/ (+ .2 .3) 2); = .25
+(/ (+ .2 .5) 2); = .35
+
+
+; exercise 2.14
+
+(define (par1 r1 r2)
+  (div-interval (mul-interval r1 r2)
+		(add-interval r1 r2)))
+(define (par2 r1 r2)
+  (let ((one (make-interval 1 1)))
+    (div-interval one
+		  (add-interval (div-interval one r1)
+				(div-interval one r2)))))
+
+(define a (make-center-percent 3 .00000001))
+(define b (make-center-percent 2 .00000001))
+(width a)
+(width b)
+(define c (div-interval a b))
+(define d (div-interval a b))
+(make-center-percent (center c) (percent c))
+; (1.4999999916666666 . 1.5000000083333334)
+(make-center-percent (center d) (percent d))
+; (1.4999999916666666 . 1.5000000083333334)
+
+; exercise 2.15
+She is right because each use of an uncertain number brings a certain amount
+of error into the result.  This is due to the nature of intervals, in that
+we are not dealing with exact values. Instead they have tolerances of error
+that we must take into account when performing arithmetic on them. The more
+operations on the unknown quantities, the higher our tolerance must be.
+
+; exercise 2.16
+Similar to the answer to exercise 2.15, this is due to the nature of intervals and
+that we must accept some tolerance for error. It is to devise an interval-arithmetic
+package that does not have this shortcoming, as this "feature" is inherent when
+dealing with intervals.
+
+; exercise 2.17
+(define (last-pair l)
+  (if (null? (cdr l))
+      l
+      (last-pair (cdr l))))
+
+(last-pair (list 23 72 149 34)) ; (34)
+
+; exercise 2.18
+(define (reverse l)
+  (if (null? (cdr l))
+      l
+      (append (reverse (cdr l)) (list (car l)))))
