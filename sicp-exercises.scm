@@ -1557,3 +1557,52 @@ dealing with intervals.
   (if (null? (cdr l))
       l
       (append (reverse (cdr l)) (list (car l)))))
+
+; exercise 2.19
+(define us-coins (list 50 25 10 5 1))
+(define uk-coins (list 100 50 20 10 5 2 1 0.5))
+(define (cc amount coin-values)
+  (cond ((= amount 0) 1)
+	((or (< amount 0) (no-more? coin-values)) 0)
+	(else
+	 (+ (cc amount
+		(except-first-denomination
+		 coin-values))
+	    (cc (- amount
+		   (first-denomination coin-values))
+		coin-values)))))
+(define (first-denomination values)
+  (car values))
+(define (except-first-denomination values)
+  (cdr values))
+(define (no-more? values)
+  (null? values))
+
+; no the order does not matter as the nature of the algorithm
+; is to break the problem into two subproblems: one where the first
+; coin in the input list is considered, and one where it is discarded.
+; So as long as all coins are still considered, the result will be the
+; same.
+
+; exercise 2.20
+(define (same-parity a . more)
+  (define (filter f the-list ans-list)
+    (cond ((null? the-list) ans-list)
+	  ((f (car the-list))
+	   (append (list (car the-list)) (filter f (cdr the-list) ans-list)))
+	  (else (filter f (cdr the-list) ans-list))))
+  (if (even? a)
+      (append (list a) (filter even? more ()))
+      (append (list a) (filter odd? more ()))))
+; alternative form:
+(define (same-parity a . more)
+  (define (filter f the-list)
+    (cond ((null? the-list) ())
+	  ((f (car the-list))
+	   (cons (car the-list) (filter f (cdr the-list))))
+	  (else (filter f (cdr the-list)))))
+  (if (even? a)
+      (cons a (filter even? more))
+      (cons a (filter odd? more))))
+;(same-parity 2 3 4 5 6 7)
+;(same-parity 1 2 3 4 5 6 7)
