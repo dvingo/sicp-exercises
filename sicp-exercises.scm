@@ -1557,6 +1557,11 @@ dealing with intervals.
   (if (null? (cdr l))
       l
       (append (reverse (cdr l)) (list (car l)))))
+; or with cons instead of append:
+(define (reverse l)
+  (if (null? (cdr l))
+      (car l)
+      (cons (reverse (cdr l)) (list (car l)))))
 
 ; exercise 2.19
 (define us-coins (list 50 25 10 5 1))
@@ -1606,3 +1611,130 @@ dealing with intervals.
       (cons a (filter odd? more))))
 ;(same-parity 2 3 4 5 6 7)
 ;(same-parity 1 2 3 4 5 6 7)
+
+; exercise 2.21
+(define (map proc items)
+  (if (null? items)
+      ()
+      (cons (proc (car items))
+	    (map proc (cdr items)))))
+
+(define (square x) (* x x))
+(define (square-list items)
+  (if (null? items)
+      ()
+      (cons (square (car items)) (square-list (cdr items)))))
+
+(define (square-list2 items) (map square items))
+
+; exercise 2.22
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+	answer
+	(iter (cdr things)
+	      (cons (square (car things))
+		    answer))))
+  (iter items ()))
+
+; It is in reverse because the cons operator's first argument is
+; the first element of the passed list, while the second is
+; the existing answer list.
+; Thus the answer list is built back to front, with the first
+; item of the passed 'items' list being added to the list first
+; (in last place).
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+	answer
+	(iter (cdr things)
+	      (cons answer
+		    (square (car things))))))
+  (iter items ()))
+
+; The problem here is that you end up cons'ing lists of lists
+; instead of lists of individual elements due to the first
+; item in the cons being the empty list instead of it being the last
+
+; exercise 2.23
+(define (for-each f items)
+  (define (helper i)
+    (f i)
+    (for-each f (cdr items)))
+  (if (null? items)
+      #t
+      (helper (car items))))
+
+(for-each (lambda (x) (newline) (display x)) (list 57 321 88))
+;57
+;321
+;88
+;Value: #t
+
+; exercise 2.24
+1 ]=> (list 1 (list 2 (list 3 4)))
+
+; (1 (2 (3 4)))
+
+; ascii art of the box and pointer
+; the numbers are pointers to numbers and the empty 
+; brackets contain dots with the subsequent arrows coming
+; out of them.
+[1][]->[2][]->[3][]->[4][/]
+
+; ascii art of the tree represented by the list
+(1 (2 (3 4)))
+      /\
+     /  \
+    1   (2 (3 4))
+         /\
+        /  \
+       2   (3 4)
+            /\
+           /  \
+          3    4
+
+; exercise 2.25
+(define y (list 1 3 (list 5 7) 9))
+(car (cdr (caddr y)))
+
+(define y (list (list 7)))
+(caar y)
+
+(define y (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+(cadr (cadr (cadr (cadr (cadr (cadr y))))))
+
+; exercise 2.26
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+
+(append x y); (1 2 3 4 5 6)
+(list x y); ((1 2 3) (4 5 6))
+
+; exercise 2.27
+(define (reverse l)
+  (if (null? (cdr l))
+      (car l)
+      (cons (reverse (cdr l)) (list (car l)))))
+
+(define (deep-reverse l)
+  (if (not (list? l))
+      l
+      (if (null? (cdr l))
+	  (deep-reverse (car l))
+	  (cons (deep-reverse (cdr l)) (list (deep-reverse (car l)))))))
+
+(define x (list (list 1 2) (list 3 4)))
+(reverse x)
+; ((3 4) (1 2))
+(deep-reverse x)
+; ((4 3) (2 1))
+
+; exercise 2.28
+(define (fringe l)
+  (define (helper li ans)
+    (cond ((not (list? li)) (append ans (list li)))
+	  ((null? (cdr li)) (helper (car li) ans))
+	  (else
+	   (append (helper (car li) ans) (helper (cdr li) ans)))))
+(helper l ()))
