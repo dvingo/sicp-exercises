@@ -1868,6 +1868,19 @@ this repeats for (3) where we get ()
 when cons'ed with 3 we get ((3) ()) - which gets appended to the result
 
 ; exercise 2.33
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+	  (accumulate op initial (cdr sequence)))))
 
+(define (map p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) () sequence))
 
+(define (append seq1 seq2)
+  (accumulate cons seq2 seq1))
 
+(define (length sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+; exercise 2.34
