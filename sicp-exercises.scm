@@ -1884,3 +1884,128 @@ when cons'ed with 3 we get ((3) ()) - which gets appended to the result
   (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
 
 ; exercise 2.34
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms)
+		(if (pair? higher-terms)
+		    (+ this-coeff (* x (horner-eval x higher-terms)))
+		    (+ this-coeff (* x higher-terms))))
+	      0
+	      coefficient-sequence))
+
+(horner-eval 2 (list 1 3 0 5 0 1)); 79
+
+; exercise 2.35
+; from the text:
+(define (count-leaves x)
+  (cond ((null? x) 0)
+        ((not (pair? x)) 1)
+        (else (+ (count-leaves (car x))
+                 (count-leaves (cdr x))))))
+; from the text:
+(define (enumerate-tree tree)
+  (cond ((null? tree) ())
+	((not (pair? tree)) (list tree))
+	(else (append (enumerate-tree (car tree))
+		      (enumerate-tree (cdr tree))))))
+(enumerate-tree (list 1 (list 2 (list 3 4)) 5))
+; (1 2 3 4 5)
+
+(define (count-leaves t)
+  (accumulate + 0 (map (lambda (r) 1) (enumerate-tree t))))
+
+(define y (list 1 (list 2 (list 3 4)) 5))
+(define x (list (list 1 2) (list 3 4)))
+(length x); 3
+(count-leaves x); 4
+(count-leaves y); 5
+
+; exercise 2.36
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      ()
+      (cons (accumulate op init (map (lambda (x) (car x)) seqs))
+	    (accumulate-n op init (map (lambda (x) (cdr x)) seqs)))))
+
+(define y (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+
+(accumulate-n + 0 y)
+
+; exercise 2.37
+
+(define mat (list (list 1 2 3 4) (list 4 5 6 6) (list 6 7 8 9)))
+(define vec (list 2 2 2 2))
+
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (x) (accumulate-n * 1 (list x v))) m))
+
+(matrix-*-vector mat vec)
+;Value 35: ((2 4 6 8) (8 10 12 12) (12 14 16 18))
+
+(define (transpose mat)
+  (accumulate-n cons () mat))
+
+(transpose mat)
+; ((1 4 6) (2 5 7) (3 6 8) (4 6 9))
+
+; mat:
+((1 2 3 4)
+ (4 5 6 6)
+ (6 7 8 9))
+; transpose of mat:
+((1 4 6)
+ (2 5 7)
+ (3 6 8)
+ (4 6 9))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (y)
+	   (map (lambda (x)
+		  (accumulate +
+			      0
+			      (accumulate-n *
+					    1
+					    (list y x))))
+		mat))
+	 mat)))
+
+(define b (transpose mat))
+(matrix-*-matrix mat b)
+;((30 56 80) (56 113 161) (80 161 230))
+
+; exercise 2.38 
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+	result
+	(iter (op result (car rest))
+	      (cdr rest))))
+  (iter initial sequence))
+
+(define fold-right accumulate)
+(fold-right / 1 (list 1 2 3)); 3/2
+(fold-left / 1 (list 1 2 3)); 1/6
+(fold-right list () (list 1 2 3)); (1 (2 (3 ())))
+(fold-left list () (list 1 2 3)); (((() 1) 2) 3)
+
+The operation must produce the same value regardless of the 
+input order. For example addition and multiplication produce the same output:
+
+(fold-right * 1 (list 1 2 3)); 6
+(fold-left * 1 (list 1 2 3)); 6
+
+(fold-right + 1 (list 1 2 3)); 7
+(fold-left + 1 (list 1 2 3)); 7
+
+; exercise 2.39
+
+(define (reverse sequence)
+  (fold-right (lambda (x y) (append y (list x))) () sequence))
+(reverse (list 1 2 3))
+
+(define (reverse sequence)
+  (fold-left (lambda (x y) (cons y x)) () sequence))
+(reverse (list 1 2 3))
