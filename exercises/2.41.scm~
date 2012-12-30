@@ -1,4 +1,0 @@
-(define (sum-to-given n s)
-
-(define (equal-n? li i)
-  (= (+ (car li) (cadr li) (caadr li)) i))
