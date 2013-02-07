@@ -1,0 +1,5 @@
+She is right because each use of an uncertain number brings a certain amount
+of error into the result.  This is due to the nature of intervals, in that
+we are not dealing with exact values. Instead they have tolerances of error
+that we must take into account when performing arithmetic on them. The more
+operations on the unknown quantities, the higher our tolerance must be.

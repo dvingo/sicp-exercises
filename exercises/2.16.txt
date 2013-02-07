@@ -1,0 +1,4 @@
+Similar to the answer to exercise 2.15, this is due to the nature of intervals and
+that we must accept some tolerance for error. It is impossible to devise 
+an interval-arithmetic package that does not have this shortcoming, 
+as this "feature" is inherent when dealing with intervals.
