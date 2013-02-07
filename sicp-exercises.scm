@@ -641,17 +641,6 @@ dealing with intervals.
 
 (last-pair (list 23 72 149 34)) ; (34)
 
-; exercise 2.18
-(define (reverse l)
-  (if (null? (cdr l))
-      l
-      (append (reverse (cdr l)) (list (car l)))))
-; or with cons instead of append:
-(define (reverse l)
-  (if (null? (cdr l))
-      (car l)
-      (cons (reverse (cdr l)) (list (car l)))))
-
 ; exercise 2.19
 (define us-coins (list 50 25 10 5 1))
 (define uk-coins (list 100 50 20 10 5 2 1 0.5))
