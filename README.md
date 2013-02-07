@@ -4,4 +4,4 @@ This is a repository containing notes and exercise solutions from the (in)famous
 
 The book can be found here: [http://sicpebook.wordpress.com/](http://sicpebook.wordpress.com/)
 
-All exercises were run against the MIT/GNU [Scheme](http://groups.csail.mit.edu/mac/projects/scheme/)
+All exercises were run against the MIT/GNU [Scheme](http://groups.csail.mit.edu/mac/projects/scheme/) interpreter, and is a work in progres...
