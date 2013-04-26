@@ -21,15 +21,16 @@
    (- (ycor-vect v1)
       (ycor-vect v2))))
 
-(define (scale-vect v s)
+(define (scale-vect s v)
   (make-vect
    (* s (xcor-vect v))
    (* s (ycor-vect v))))
 
-(define a (make-vect 1 2))
-(define b (make-vect 3 4))
-(xcor-vect a)
-(ycor-vect a)
-(add-vect a b)
-(sub-vect a b)
-(scale-vect b 9)
+; Tests:
+;(define a (make-vect 1 2))
+;(define b (make-vect 3 4))
+;(xcor-vect a)
+;(ycor-vect a)
+;(add-vect a b)
+;(sub-vect a b)
+;(scale-vect 9 b)
