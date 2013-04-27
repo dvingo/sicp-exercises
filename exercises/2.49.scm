@@ -51,11 +51,11 @@
   (lambda (frame graph-device)
     (for-each
      (lambda (segment)
-       (display "drawing segment: ")(display segment) (newline)
-       (display "frame-mapped start: ")
-       (display ((frame-coord-map frame) (start-segment segment)))
-       (display "frame-mapped end: ")
-       (display ((frame-coord-map frame) (end-segment segment)))
+;     (display "drawing segment: ")(display segment) (newline)
+;     (display "frame-mapped start: ")
+;     (display ((frame-coord-map frame) (start-segment segment)))
+;     (display "frame-mapped end: ")
+;     (display ((frame-coord-map frame) (end-segment segment)))
        (draw-line
 	((frame-coord-map frame) (start-segment segment))
 	((frame-coord-map frame) (end-segment segment))
@@ -105,6 +105,10 @@
 
 (define f (make-frame orig (make-vect -0.5 -0.5)
 		      (make-vect 0.2 0.5)))
+
+(define f2 (make-frame (make-vect -0.5 -0.5)
+		       (make-vect -0.9 -0.9)
+		       (make-vect 0.3 0.7)))
 		      
 (s-painter f d)
 
@@ -122,23 +126,59 @@
   (define frame-painter (segments->painter seg-list))
   (frame-painter f graph-dev))
   
+; b:
+(define (cross-frame f graph-dev)
+  (define bl (origin-frame f))
+  (define tl (edge1-frame f))
+  (define tr (add-vect (edge2-frame f) tl))
+  (define br (edge2-frame f))
+  (define seg1 (make-segment bl tr))
+  (define seg2 (make-segment br tl))
+  (define cross-painter (segments->painter (list seg1 seg2)))
+  (cross-painter f graph-dev))
 
-;(define f (make-frame orig (make-vect -0.5 -0.5)
-;		      (make-vect 0.2 0.5)))
+; c:
+(define (midpoint-segment line-segment)
+  (let ((x1 (xcor-vect (start-segment line-segment)))
+	(x2 (xcor-vect (end-segment line-segment)))
+	(y1 (ycor-vect (start-segment line-segment)))
+	(y2 (ycor-vect (end-segment line-segment))))
+	(make-vect
+	 (/ (+ x1 x2) 2)
+	 (/ (+ y1 y2) 2))))
+(define (diamond-frame f graph-dev)
+  (let ((bl (origin-frame f))
+	(tl (edge1-frame f))
+	(tr (add-vect (edge2-frame f) (edge1-frame f)))
+	(br (edge2-frame f)))
+    (let ((seg1 (make-segment bl tl))
+	  (seg2 (make-segment tl tr))
+	  (seg3 (make-segment tr br))
+	  (seg4 (make-segment br bl)))
+      (let ((diam-bl (midpoint-segment seg1))
+	    (diam-tl (midpoint-segment seg2))
+	    (diam-tr (midpoint-segment seg3))
+	    (diam-br (midpoint-segment seg4)))
+	(let ((diam-seg1 (make-segment diam-bl diam-tl))
+	      (diam-seg2 (make-segment diam-tl diam-tr))
+	      (diam-seg3 (make-segment diam-tr diam-br))
+	      (diam-seg4 (make-segment diam-br diam-bl)))
+	  (let ((diamond-painter (segments->painter (list diam-seg1
+							 diam-seg2
+							 diam-seg3
+							 diam-seg4))))
+	    (diamond-painter f graph-dev)))))))
+      
 
-;(define f (make-frame orig (make-vect -0.9 -0.5)
-;		      (make-vect 0.2 0.5)))
-
-;(outline-frame f d)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Graphics test code
-(define d (make-graphics-device (car (enumerate-graphics-types))))
-(graphics-operation d 'set-foreground-color "red")
-(graphics-operation d 'set-background-color "blue") 
-(graphics-operation d 'fill-circle 0 0 0.1)
-(graphics-draw-line d 0 0 5 5)
-(graphics-close d)
+;(define d (make-graphics-device (car (enumerate-graphics-types))))
+;(graphics-operation d 'set-foreground-color "red")
+;(graphics-operation d 'set-background-color "blue") 
+;(graphics-operation d 'fill-circle 0 0 0.1)
+;(graphics-draw-line d 0 0 5 5)
+;(graphics-close d)
 
 ; Drawing in MIT-Scheme References:
 ;http://sicp.ai.mit.edu/Spring-2005/manuals/scheme-7.5.5/doc/scheme_18.html#SEC192
