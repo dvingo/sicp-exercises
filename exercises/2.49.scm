@@ -71,7 +71,6 @@
   (graphics-draw-line d (xcor-vect v1) (ycor-vect v1)
 		      (xcor-vect v2) (ycor-vect v2)))
 
-
 (define d (make-graphics-device (car (enumerate-graphics-types))))
 ; move origin to bottom left of screen
 (graphics-set-coordinate-limits d 0 0 2 2)
@@ -80,7 +79,6 @@
 ;(define e1 (make-vect -1.3 -0.2))
 ;(define e2 (make-vect 0.1 0.1))
 ;(define f (make-frame orig e1 e2))
-
 
 ;(define orig (make-vect 0 0))
 ;(define f (make-frame orig (make-vect 0.5 0.5)
@@ -93,9 +91,6 @@
 ;(define f3 (make-frame (make-vect 0 0)
 ;		       (make-vect 0 1)
 ;		       (make-vect 1 0)))
-		       
-		      
-;(s-painter f d)
 
 ; a:
 (define (outline-frame f graph-dev)
