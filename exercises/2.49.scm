@@ -51,11 +51,6 @@
   (lambda (frame graph-device)
     (for-each
      (lambda (segment)
-;     (display "drawing segment: ")(display segment) (newline)
-;     (display "frame-mapped start: ")
-;     (display ((frame-coord-map frame) (start-segment segment)))
-;     (display "frame-mapped end: ")
-;     (display ((frame-coord-map frame) (end-segment segment)))
        (draw-line
 	((frame-coord-map frame) (start-segment segment))
 	((frame-coord-map frame) (end-segment segment))
@@ -78,20 +73,8 @@
 
 
 (define d (make-graphics-device (car (enumerate-graphics-types))))
-;(define v1 (make-vect 0 0))
-;(define v2 (make-vect 0.5 0.3))
-;(define seg1 (make-segment v1 v2))
-;(draw-line (start-segment seg1) (end-segment seg1) d)
-
-; finally to the code:
-(define seg1 (make-segment (make-vect 0.1 0)
-			   (make-vect 0.3 0)))
-(define seg2 (make-segment (make-vect 0.2 0.1)
-			   (make-vect 0.8 0.8)))
-
-(define seg-list (list seg1 seg2))
-
-(define s-painter (segments->painter seg-list))
+; move origin to bottom left of screen
+(graphics-set-coordinate-limits d 0 0 2 2)
 
 ;(define orig (make-vect 0 1))
 ;(define e1 (make-vect -1.3 -0.2))
@@ -99,18 +82,20 @@
 ;(define f (make-frame orig e1 e2))
 
 
-(define orig (make-vect 0 0))
-;(define e1 (make-vect -1.3 -0.2))
-;(define e2 (make-vect 0.1 0.1)
+;(define orig (make-vect 0 0))
+;(define f (make-frame orig (make-vect 0.5 0.5)
+;		      (make-vect 0.2 0.5)))
 
-(define f (make-frame orig (make-vect -0.5 -0.5)
-		      (make-vect 0.2 0.5)))
+;(define f2 (make-frame (make-vect -0.5 -0.5)
+;		       (make-vect 0.9 0.9)
+;		       (make-vect 0.3 0.7)))
 
-(define f2 (make-frame (make-vect -0.5 -0.5)
-		       (make-vect -0.9 -0.9)
-		       (make-vect 0.3 0.7)))
+;(define f3 (make-frame (make-vect 0 0)
+;		       (make-vect 0 1)
+;		       (make-vect 1 0)))
+		       
 		      
-(s-painter f d)
+;(s-painter f d)
 
 ; a:
 (define (outline-frame f graph-dev)
@@ -168,11 +153,79 @@
 							 diam-seg3
 							 diam-seg4))))
 	    (diamond-painter f graph-dev)))))))
-      
+; (diamond-frame f2 d)
 
+; alternative diamond painter:
+(define (diamond-f f graph-dev)
+  (let ((segs (list (make-segment (make-vect 0 0.5)
+				  (make-vect 0.5 0))
+		    (make-segment (make-vect 0.5 0)
+				  (make-vect 1 0.5))
+		    (make-segment (make-vect 0.5 1)
+				  (make-vect 1 0.5))
+		    (make-segment (make-vect 0.5 1)
+				  (make-vect 0 0.5)))))
+      ((segments->painter segs) f graph-dev)))
+
+; d:
+; for some reason the coordinates are now reversed, make-vect 
+; should be viewed as (y x) not (x y)
+(define (wave-frame f graph-dev)
+  (define guy (list (make-segment (make-vect 0 0.4)
+				  (make-vect 0.33 0.5))
+		    (make-segment (make-vect 0.33 0.5)
+				  (make-vect 0 0.6))
+		    ; left side
+		    (make-segment (make-vect 0 0.33)
+				  (make-vect 0.6 0.4))
+		    ; left arm
+		    (make-segment (make-vect 0.6 0.4)
+				  (make-vect 0.5 0.2))
+		    (make-segment (make-vect 0.5 0.2)
+				  (make-vect 0.8 0))
+
+		    (make-segment (make-vect 0.7 0.4)
+				  (make-vect 0.6 0.2))
+		    (make-segment (make-vect 0.6 0.2)
+				  (make-vect 0.9 0))
+
+		    ; neck
+		    (make-segment (make-vect 0.7 0.4)
+				  (make-vect 0.7 0.45))
+		    (make-segment (make-vect 0.7 0.55)
+				  (make-vect 0.7 0.6))
+		    (make-segment (make-vect 0.7 0.45)
+				  (make-vect 0.75 0.45))
+		    (make-segment (make-vect 0.7 0.55)
+				  (make-vect 0.75 0.55))
+
+		    ; head
+		    (make-segment (make-vect 0.75 0.45)
+				  (make-vect 0.8 0.4))
+		    (make-segment (make-vect 0.75 0.55)
+				  (make-vect 0.8 0.60))
+
+		    (make-segment (make-vect 0.8 0.4)
+				  (make-vect 0.85 0.4))
+		    (make-segment (make-vect 0.8 0.6)
+				  (make-vect 0.85 0.6))
+		    
+		    (make-segment (make-vect 0.85 0.4)
+				  (make-vect 1.00 0.5))
+		    (make-segment (make-vect 0.85 0.6)
+				  (make-vect 1.00 0.5))
+
+		    ; right side
+		    (make-segment (make-vect 0 0.67)
+				  (make-vect 0.6 0.6))
+		    (make-segment (make-vect 0.6 0.6)
+				  (make-vect 0.2 1))
+		    (make-segment (make-vect 0.7 0.6)
+				  (make-vect 0.25 1))))
+  ((segments->painter guy) f graph-dev))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
-; Graphics test code
+; Graphics test code for any future reference needs:
 ;(define d (make-graphics-device (car (enumerate-graphics-types))))
 ;(graphics-operation d 'set-foreground-color "red")
 ;(graphics-operation d 'set-background-color "blue") 
@@ -183,3 +236,15 @@
 ; Drawing in MIT-Scheme References:
 ;http://sicp.ai.mit.edu/Spring-2005/manuals/scheme-7.5.5/doc/scheme_18.html#SEC192
 ; http://www.gnu.org/software/mit-scheme/documentation/mit-scheme-ref/Graphics.html#Graphics
+
+; to display the current screen coordinates:
+;(call-with-values  (lambda () (graphics-coordinate-limits d) )
+;  (lambda (x y a b)
+;    (display x)
+;    (display y) 
+;    (display a)
+;    (display b)))
+
+; to change the virtual coordinate system of the opened window (device)
+;(graphics-set-coordinate-limits d 0 0 2 2)
+;(graphics-set-coordinate-limits d 0 0 1 1)
