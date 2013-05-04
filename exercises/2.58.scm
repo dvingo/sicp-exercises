@@ -59,8 +59,8 @@
 
 ;Value 59: (0 + ((3 * (0 + (0 + 0))) + (0 * (x + (y + 2)))))
 
-; for now without simplification
 
+; ----------------------------------------------------------
 ; b:
 (define (sum? x)
   (cond ((not (pair? x)) #f)
@@ -93,24 +93,24 @@
 (define (augend s)
   (caddr s))
 
-; this is broken....
-
 (define (multiplier p)
   (define (helper li ret-list)
-    (cond ((null? li)
-	   (if (= (length ret-list) 1)
-	       (car ret-list)
-	       ret-list))
-	  ((eq? (car li) '*)
+    (cond ((eq? (car li) '*)
+	   ; if we're at the end, return the ret-list
 	   (if (null? (cddr li))
 	       (if (= (length ret-list) 1)
 		   (car ret-list)
 		   ret-list)
+	       ; otherwise keep going
 	       (helper (cdr li) (append ret-list (list (car li))))))
-	  (else (if (pair? (car li))
-		    (helper (cdr li) (append ret-list (car li)))
-		    (helper (cdr li) (append ret-list (list (car li))))))))
+	  (else (helper (cdr li) (append ret-list (list (car li)))))))
   (helper p ()))
+
+; test
+; original form:  (* (* x y) (+ x 3))
+; (deriv '(x * y * (x + 3)) 'x)
+; (deriv '(x * y) 'x); y
+; (deriv '(x + 3) 'x); 1
 
 ; test:
 ; (define n1 '(x * y * (x + 3)))
