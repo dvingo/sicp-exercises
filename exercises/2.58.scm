@@ -10,7 +10,10 @@
 ; (sum? s3) ; #t
 
 (define (make-sum a1 a2)
-  (list a1 '+ a2))
+  (cond ((=number? a1 0) a2)
+	((=number? a2 0) a1)
+	((and (number? a1) (number? a2) (+ a1 a2)))
+	(else (list a1 '+ a2))))
 
 (define (addend s)
   (car s))
@@ -35,7 +38,11 @@
 ; (product? m); #t
 
 (define (make-product m1 m2)
-  (list m1 '* m2))
+  (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+	((=number? m1 1) m2)
+	((=number? m2 1) m1)
+	((and (number? m1) (number? m2) (* m1 m2)))
+	(else (list m1 '* m2))))
 
 (define (multiplier p)
   (car p))
@@ -61,12 +68,17 @@
 	(else (and (not (product? x))
 		   (pair? x) (eq? (cadr x) '+)))))
 
+; assuming multiplication is always done before addition so the following
+; would be a product, but not a sum:
+; '(a * b) + (c * w))
+
 (define (product? x)
   (cond ((not (pair? x)) #f)
 	((and (pair? x) (null? (cdr x))) (product? (car x)))
 	((eq? (cadr x) '*) #t)
 	((pair? (cddr x)) (product? (cddr x)))))
-	
+
+; tests:	
 ; (define s1 '(x + 3 * (x + y + 2)))
 ; (sum? s1) ; #f
 ; (product? s1 ; #t
@@ -75,14 +87,49 @@
 ; (sum? s2) ; #t
 ; (product? s2) ; #f
 
-
-;; these need to be a bit smarter than this
 (define (addend s)
   (car s))
+
 (define (augend s)
-  (cddr s))
+  (caddr s))
+
+; this is broken....
 
 (define (multiplier p)
-  (car p))
+  (define (helper li ret-list)
+    (cond ((null? li)
+	   (if (= (length ret-list) 1)
+	       (car ret-list)
+	       ret-list))
+	  ((eq? (car li) '*)
+	   (if (null? (cddr li))
+	       (if (= (length ret-list) 1)
+		   (car ret-list)
+		   ret-list)
+	       (helper (cdr li) (append ret-list (list (car li))))))
+	  (else (if (pair? (car li))
+		    (helper (cdr li) (append ret-list (car li)))
+		    (helper (cdr li) (append ret-list (list (car li))))))))
+  (helper p ()))
+
+; test:
+; (define n1 '(x * y * (x + 3)))
+; (multiplier n1) ; (x * y)
+; (define n2 '(x * y * z * (x + 3) * 4))
+; (multiplier n2) ; (x * y * z * (x + 3))
+
 (define (multiplicand p)
-  (ca
+  (define (helper li ret-list)
+    (cond ((null? li) ret-list)
+	   ((eq? (car li) '*)
+	    (if (null? (cdr li))
+		ret-list
+		(helper (cdr li) (cadr li))))
+	   (else (helper (cdr li) ret-list))))
+  (helper p ()))
+
+; test:
+; (define n1 '(x * y * (x + 3)))
+; (multiplicand n1) ; (x + 3)
+; (define n2 '(x * y * z * (x + 3) * 4))
+; (multiplicand n2) ; 4
