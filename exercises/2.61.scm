@@ -19,9 +19,9 @@
 		(intersection-set set1 (cdr set2)))))))
 
 (define (adjoin-set x set)
-  ; using the same logic as element-of-set
-  ; where we stop once we find the item that is greater than the one
-  ; to insert
+  ;; using the same logic as element-of-set
+  ;; where we stop once we find the item that is greater than the one
+  ;; to insert
   (define (place-item item past-set search-set)
     (cond ((null? search-set) (append set (list item)))
 	  ((> (car search-set) item)
