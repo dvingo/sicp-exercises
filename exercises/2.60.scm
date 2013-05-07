@@ -27,8 +27,7 @@
 ; (define s1 '(2 3 2 1 3 2 2))
 ; (define s2 '(a b c d 1 3))
 ; (union-set s1 ());  (2 3 2 1 3 2 2)
-; (union-set s1 s2); (2 3 2 1 3 2 2 a b c d 1 3)     
-
+; (union-set s1 s2); (2 3 2 1 3 2 2 a b c d 1 3)
 
 ;this exhibits the same running time as the first
 ; due to the need to check all of set2 for each element of set1
