@@ -26,7 +26,7 @@
 (define (element-of-ordered-set? x set)
   (cond ((null? set) #f)
 	((= x (car set)) #t)
-	((< x (car set)) false)
+	((< x (car set)) #f)
 	(else (element-of-ordered-set? x (cdr set)))))
 
 (define (adjoin-ordered-set x set)
@@ -44,17 +44,35 @@
       set
       (place-item x () set)))
 
+
+; (load "2.63.scm")
 (define (union-set set1 set2)
   (define (unique-list li set ret-list)
+    ;; uses helper adjoin-ordered-set to create a unique 
+    ;; list representation of the union of set1 and set2
     (cond ((null? li) ret-list)
 	  ((not (element-of-set? (car li) set))
 	   (unique-list (cdr li) set (adjoin-ordered-set (car li) ret-list)))
 	  (else (unique-list (cdr li) set ret-list))))
+  ;; Create a list of ordered unique elements of set1 and set2
+  ;; tree->list-2 has a linear growth running time
   (define the-set (unique-list (tree->list-2 set1) set2 (tree->list-2 set2)))
+  ;; Convert that list into a balanced binary tree
   (list->tree the-set))
-    
+
 (define (intersection-set set1 set2)
-)
+  (define (intersection-list li set ret-list)
+    ;; uses helper adjoin-ordered-set to create the interesection of li and set
+    (cond ((null? li) ret-list)
+	  ((element-of-set? (car li) set)
+	   (intersection-list (cdr li) set (adjoin-ordered-set (car li) ret-list)))
+	  (else (intersection-list (cdr li) set ret-list))))
+  ;; Create a list of ordered unique elements of set1 and set2
+  ;; tree->list-2 has a linear growth running time
+  (define the-set (intersection-list (tree->list-2 set1) set2 '()))
+  ;; Convert that list into a balanced binary tree
+  (list->tree the-set))
+  
 
 (define tree1 (list->tree '(7 10 11 12 13)))
 (define tree2 (list->tree '(1 3 5 7 9 11)))
@@ -78,3 +96,21 @@
                             \
                             13
 
+
+(intersection-set tree1 tree2)
+
+;Value 4: (7 () (11 () ()))
+
+                        7
+                          \
+                           11
+
+(define tree3 (list->tree '(1 7 10 11 12 13)))
+(define tree4 (list->tree '(1 3 5 7 9 11)))
+
+(intersection-set tree3 tree4)
+;Value 6: (7 (1 () ()) (11 () ()))
+
+                        7
+                      /   \
+                     1     11
