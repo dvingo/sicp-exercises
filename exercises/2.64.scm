@@ -23,6 +23,18 @@
 		(cons (make-tree
 		       this-entry left-tree right-tree)
 		      remaining-elts))))))))
+
+; a second attempt at 'a':
+The algorithm continually calls 'left-result' halving
+the input until there are none left. This fill out the left
+half of the tree. By using half of n as the point to split
+on this has the effect of creating the desired balanced tree.
+Once the algorithm bottoms out on the left side of the input,
+It recursively calls itself to build the right sub-tree.
+After all the recursive steps are hit it builds up the output
+tree bottom up by cons'ing together all the recursive sub-trees.
+
+
 ; a:
 Partial tree description:
 - set left-size to half the input size
