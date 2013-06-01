@@ -68,25 +68,25 @@
 				     (make-tree 11 () ()))))
 
 ;; Tests
-(tree->list-1 tree1)
+;(tree->list-1 tree1)
 ; (1 3 5 7 9 11)
 
-(tree->list-1 tree2)
+;(tree->list-1 tree2)
 ;(1 3 5 7 9 11)
 
-(tree->list-1 tree3)
+;(tree->list-1 tree3)
 ;(1 3 5 7 9 11)
 
-(tree->list-1 tree3)
+;(tree->list-1 tree3)
 ;(1 3 5 7 9 11)
 
-(tree->list-2 tree1)
+;(tree->list-2 tree1)
 ;(1 3 5 7 9 11)
 
-(tree->list-2 tree2)
+;(tree->list-2 tree2)
 ;(1 3 5 7 9 11)
 
-(tree->list-2 tree3)
+;(tree->list-2 tree3)
 ;(1 3 5 7 9 11)
 
 ; a:
@@ -95,9 +95,9 @@
 ; just append the recursive calls directly.
 
 ; b:
-Each one results in a recursive call for the left and right branch
-yet the first algorithm uses append, whereas the second uses only cons.
-The append call will traverse the left branch which is about 
-half the nodes in the tree and thus has a running time of O(log(n))
-resulting in a running time of O(n log(n)) for the first algorithm, and
-a running time of O(n) for the second.
+;Each one results in a recursive call for the left and right branch
+;yet the first algorithm uses append, whereas the second uses only cons.
+;The append call will traverse the left branch which is about 
+;half the nodes in the tree and thus has a running time of O(log(n))
+;resulting in a running time of O(n log(n)) for the first algorithm, and
+;a running time of O(n) for the second.
