@@ -46,7 +46,7 @@
 (define (choose-branch bit branch)
   (cond ((= bit 0) (left-branch branch))
 	((= bit 1) (right-branch branch))
-	(else (error "bat bit - CHOOSE-BRANCH" bit))))
+	(else (error "bad bit - CHOOSE-BRANCH" bit))))
 
 (define (adjoin-set x set)
   (cond ((null? set) (list x))
@@ -61,6 +61,8 @@
 	(adjoin-set (make-leaf (car pair)   ;symbol
 			       (cadr pair)) ;frequency
 		    (make-leaf-set (cdr pairs))))))
+
+; (make-leaf-set '((A 4) (B 2) (C 1) (D 1)))
 
 
 ; Encoding
