@@ -71,3 +71,9 @@
       '()
       (append (encode-symbol (car message) tree)
 	      (encode (cdr message) tree))))
+
+
+(define (debug-print description item)
+  (display description)
+  (display item)
+  (newline))
