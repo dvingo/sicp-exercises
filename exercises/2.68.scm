@@ -29,4 +29,5 @@
 		   (make-code-tree (make-leaf 'D 1)
 				   (make-leaf 'C 1)))))
 ; test: (encode '(a d a b b c a) sample-tree)
+; message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
 ; Value 2: (0 1 1 0 0 1 0 1 0 1 1 1 0)
