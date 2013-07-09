@@ -1,0 +1,11 @@
+The order of growth is dependent on the relative frequency of the symbol,
+this is why they say it is difficult to answer for the general case.
+A cursory attempt would be (logn / 2) for the most frequent symbol
+ and bigTheta(nlogn) for the least frequent symbol.
+The least frequent is nlogn because you are halving your input with
+ each recursive call, but must traverse the entire input (via the contains? method).
+
+For the case of 2.71 bigTheta(n) for the most frequent symbol
+ and bigTheta(n * (n-1)) for the least frequent symbol because the least frequent
+ symbol will always require n - 1 recursive calls. (plus traversing the entire input
+ for the contains? calls).

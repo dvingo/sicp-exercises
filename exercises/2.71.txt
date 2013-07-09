@@ -1,0 +1,78 @@
+Where the relative frequencies are computed via 2^(n-1)
+
+n = 5
+
+n1 1    n3 4    n5 16
+n2 2    n4 8
+
+
+                                   {n5 n4 n3 n2 n1} 31
+                                   .
+                                /     \
+                               /       \
+                        n5 16 .         . {n4 n3 n2 n1} 15
+                                      /  \
+                                     /    \
+                               n4 8 .      . {n3 n2 n1} 7
+                                         /  \
+                                        /    \
+                                  n3 4 .      . {n2 n1} 3
+                                            /  \
+                                           /    \
+                                     n2 2 .      . n1 1
+      
+
+
+
+
+n = 10 
+
+n1 1    n3 4    n5 16    n7 64    n9 256
+n2 2    n4 8    n6 32    n8 128   n10 512
+
+
+Initial {(n10 512) (n9 256) (n8 128) (n7 64) (n6 32) (n5 16) (n4 8) (n3 4) (n2 2) (n1 1)}
+Merge {(n10 512) (n9 256) (n8 128) (n7 64) (n6 32) (n5 16) (n4 8) (n3 4) ({n2 n1} 3)}
+Merge {(n10 512) (n9 256) (n8 128) (n7 64) (n6 32) (n5 16) (n4 8) ({n3 n2 n1} 7)}
+Merge {(n10 512) (n9 256) (n8 128) (n7 64) (n6 32) (n5 16) ({n4 n3 n2 n1} 15)}
+Merge {(n10 512) (n9 256) (n8 128) (n7 64) (n6 32) ({n5 n4 n3 n2 n1} 31)}
+Merge {(n10 512) (n9 256) (n8 128) (n7 64) ({n6 n5 n4 n3 n2 n1} 63)}
+Merge {(n10 512) (n9 256) (n8 128) ({n7 n6 n5 n4 n3 n2 n1} 127)}
+Merge {(n10 512) (n9 256) ({n8 n7 n6 n5 n4 n3 n2 n1} 255)}
+Merge {(n10 512) ({n9 n8 n7 n6 n5 n4 n3 n2 n1} 511)}
+Merge {({n10 n9 n8 n7 n6 n5 n4 n3 n2 n1} 1023)}
+
+
+                {n10 n9 n8 n7 n6 n5 n4 n3 n2 n1} 1023
+                .
+               / \
+              /   \
+    n10 512  .     . {n9 n8 n7 n6 n5 n4 n3 n2 n1} 511
+                  / \
+                 /   \
+         n9 256 .     . {n8 n7 n6 n5 n4 n3 n2 n1} 255
+                     / \
+                    /   \
+            n8 128 .     .  {n7 n6 n5 n4 n3 n2 n1} 127
+	                / \
+                       /   \
+                n7 64 .     .  {n6 n5 n4 n3 n2 n1} 63
+                           / \
+                          /   \
+                   n6 32 .     . {n5 n4 n3 n2 n1} 31
+                              / \
+                             /   \
+                      n5 16 .     . {n4 n3 n2 n1} 15
+		      	         / \
+ 			        /   \
+		          n4 8 .     . {n3 n2 n1} 7
+                                    / \
+                                   /   \
+                             n3 4 .     . {n2 n1} 3
+                                       / \ 
+                                      /   \
+                                n2 2 .     . n1 1
+ 
+                               
+In general 1 bit is required for the frequent symbol and n - 1 bits are required
+for the least frequent symbol.
