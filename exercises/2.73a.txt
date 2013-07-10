@@ -2,4 +2,3 @@ a. The data specific parts of the program were moved into the
 operator-type table. number? and variable? are not represented as list
  constructs so we can't use operator and operands on them
  (which assume the underlying data is a list).
-b.
