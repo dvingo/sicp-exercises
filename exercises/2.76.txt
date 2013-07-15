@@ -1,0 +1,29 @@
+; Describe the changes that must be made to a system in order to add 
+; new types or new operations.
+
+generic operation with explicit dispatch:
+   The new types and the procedures that operate on them must be added 
+to the system. Their names must also not conflict with any other procedures
+already defined.
+All client facing procedures must be updated to be aware of the new types.
+
+data-directed style:
+   The new types and the procedures that operate on them must be added
+to the dispatch table and constructors provided for tagged data of this new
+type.
+
+message-passing style:
+   A new 'object' must be added that dispatches appropriately for the new
+data type to the correct procedure for the new type.
+
+The message-passing style would be most appropriate for a system in
+ which new types must often be added. This is due to the fact that one must
+only provide the new 'object' and the procedures to operate on them, and no
+other code is changed.
+
+In a situation where new operations are added often, either data-directed 
+style or message-passing style would both be appropriate because they both
+require adding the new procedures (to the installation procedure for 
+data-directed, and the objects themselves for message-passing), and updating
+ either the dispatch table or the objects that know about the new operations.
+So they result in about the same amount of changes to the system.
