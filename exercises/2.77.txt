@@ -1,0 +1,49 @@
+This works because of the design separation of each subsystem.
+By using a multi-level tag system you can modularly build up an abstract 
+design where each layer dispatches to the one below or above it.
+
+The data Louis Reasoner is attempting to operate on is one level more 
+abstract (has one more tag associated with it) than the function he is calling
+is aware of.
+
+By adding the four functions:
+
+       (put ’real-part ’(complex) real-part)
+       (put ’imag-part ’(complex) imag-part)
+       (put ’magnitude ’(complex) magnitude)
+       (put ’angle ’(complex) angle)
+
+to the dispatching table, apply-generic will now be able to understand how
+to handle types tagged with '(complex).
+
+After adding the four functions above, apply-generic is called the first time 
+dispatching on the '(complex) tag returning the following definition of 
+magnitude:
+
+    (define (magnitude z) (apply-generic ’magnitude z))
+
+This results in another call to apply-generic where z is now tagged
+with '(rectangular) and the call to 'get' returns the following definition:
+
+    (put ’magnitude ’(rectangular) magnitude)
+
+    (define (magnitude z)
+        (sqrt (+ (square (real-part z))
+                 (square (imag-part z)))))
+
+This function is then applied to z which now contains the underlying list
+primitives and the function call returns to the client caller.
+
+So in all there are two calls to apply-generic, which makes sense as there are
+two levels of tagging that need to be dispatched upon.
+
+;; Definition of apply-generic
+
+ (define (apply-generic op . args)
+      (let ((type-tags (map type-tag args)))
+        (let ((proc (get op type-tags)))
+          (if proc
+              (apply proc (map contents args))
+              (error
+                "No method for these types - APPLY-GENERIC"
+                (list op type-tags))))))
