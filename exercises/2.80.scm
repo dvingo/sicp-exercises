@@ -1,6 +1,13 @@
-(define (zero? num)
-  (cond ((contents 
+(define (=zero? num)
+  (apply-generic '=zero? num1))
 
-; I'm thinking I'll need to define 3 procedures, install them
-; in the respective numeric packages (primitive number, rational, complex)
-; then have the client facing zero? dispatch to those.
+; Scheme numbers
+(put '=zero? '(scheme-number)
+     (lambda (x) (= x 0)))
+
+(put '=zero? '(rational)
+     (lambda (x) (= (numer x) 0)))
+
+(put '=zero? '(complex)
+     (lambda (x) (and (= (real-part x) 0)
+		      (= (imag-part x) 0))))
