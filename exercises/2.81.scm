@@ -22,16 +22,21 @@ c.
 		    (type2 (cadr type-tags))
 		    (a1 (car args))
 		    (a2 (cadr args)))
-		(let ((t1->t2 (get-coercion type1 type2))
-		      (t2->t1 (get-coercion type2 type1)))
-		  (if (eq? type1 type2)
-		      (error "Trying to coerce the same types")
+		; Add type check here and just apply the function
+		; if the args are already the same type.
+		(if (eq? type1 type2)
+		    (apply-generic op a1 a2)
+		    (let ((t1->t2 (get-coercion type1 type2))
+			  (t2->t1 (get-coercion type2 type1)))
 		      (cond (t1->t2
 			     (apply-generic op (t1->t2 a1) a2))
 			    (t2->t1
-			     (apply-generic op a1 (t2->t1 a2)))      
+			     (apply-generic op a1 (t2->t1 a2)))
+			    (apply-generic op a1 a2)
 			    (else
 			     (error "No method for these types"
 				    (list op type-tags)))))))
-		(error "No method for these types"
-		       (list op type-tags)))))))
+	      (error "No method for these types"
+		     (list op type-tags)))))))
+
+
