@@ -21,6 +21,7 @@
 	      (error "No method for these types"
 		     (list op type-tags)))))))
 
+; Solution:
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
@@ -36,7 +37,7 @@
 		    (let ((new-args (coerce a1 a2)))
 		      ; The current implementation will not return nil
 		      ; but this could be used if the hierarchy chain
-		      ; is not a tower and a coercion can not be performed
+		      ; is not a tower and a coercion cannot be performed
 		      ; by simple raising.
 		      (if (null? new-args)
 			  (error "No method for these types"
@@ -45,6 +46,10 @@
 					 (car new-args)
 					 (cadr new-args)))))))))))
 (define (coerce a1 a2)
+  ; Calls coerce on whichever parameter of a1 and a2 is lower
+  ; in a type hierarchy than the other.
+  ; This is performed recursively until the arguments
+  ; have the same type.
   (cond ((eq? (type-tag a1) (type-tag a2))
 	 (cons a1 a2))
 	((higher? a1 a2)
