@@ -1,17 +1,17 @@
-a. The lookup in apply-generic for the procedure fails so the 
-negative clause of the if expression is executed and the coercion
-procedure for complex->complex is retrieved. This succeeds, based on the
-introduction to the question (the function is added by Louis).
-The first cond clause returns true and apply-generic is executed again.
+;; a. The lookup in apply-generic for the procedure fails so the 
+;; negative clause of the if expression is executed and the coercion
+;; procedure for complex->complex is retrieved. This succeeds, based on the
+;; introduction to the question (the function is added by Louis).
+;; The first cond clause returns true and apply-generic is executed again.
 
-This will pass two complex numbers to the exponentiation function again
-and the process will repeat indefinitely, resulting in an infinite loop.
+;; This will pass two complex numbers to the exponentiation function again
+;; and the process will repeat indefinitely, resulting in an infinite loop.
 
-b. If we don't add Louis' procedures then apply-generic will correctly
-result in an error for the case above, versus running forever. So, he
-was not correct.
+;; b. If we don't add Louis' procedures then apply-generic will correctly
+;; result in an error for the case above, versus running forever. So, he
+;; was not correct.
 
-c. 
+;; c. 
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
