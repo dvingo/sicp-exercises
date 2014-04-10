@@ -116,7 +116,7 @@
 ;; *note* I apply the generic- prefix to not conflict with
 ;; the native scheme function names.
 (define (magnitude z)
-  (sqrt (add (generic-square (real-part z))
+  (generic-sqrt (add (generic-square (real-part z))
 	   (generic-square (imag-part z)))))
 (define (angle z)
   (generic-atan (imag-part z) (real-part z)))
