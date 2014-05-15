@@ -1,5 +1,5 @@
 (define (=zero? num)
-  (apply-generic '=zero? num1))
+  (apply-generic '=zero? num))
 
 ; Scheme numbers
 (put '=zero? '(scheme-number)
