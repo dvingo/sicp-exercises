@@ -3,4 +3,3 @@
 
 (put '=zero? '(poly)
      (lambda (p) (=zero? (coefficient (first-term (term-list p))))))
-

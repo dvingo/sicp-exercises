@@ -13,9 +13,9 @@ attach-tag
 ; new
 (define (type-tag datum)
   (cond ((number? datum) datum)
-	((pair? datum) (car datum))
-	(else 
-	  (error "Bad tagged datum - TYPE-TAG" datum))))
+        ((pair? datum) (car datum))
+        (else
+         (error "Bad tagged datum - TYPE-TAG" datum))))
 
 ; original
 (define (contents datum)
@@ -26,19 +26,18 @@ attach-tag
 ; new
 (define (contents datum)
   (cond ((number? datum) datum)
-	((pair? datum) (cdr datum))
-	(error "Bad tagged datum - CONTENTS" datum)))
+        ((pair? datum) (cdr datum))
+        (error "Bad tagged datum - CONTENTS" datum)))
 
 ;original
 (define (attach-tag type-tag contents)
      (cons type-tag contents))
 
-; new 
+; new
 (define (attach-tag type-tag contents)
   (cond ((number? contents) contents)
-	((symbol? contents)
-	 (cons type-tag contents))))
+        ((symbol? contents)
+         (cons type-tag contents))))
 
 (put 'add '(scheme-number scheme-number)
      (lambda (x y) (tag (+ x y))))
-

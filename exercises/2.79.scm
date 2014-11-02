@@ -8,10 +8,9 @@
 ; Rational numbers - does not simplify
 (put 'equ? '(rational rational)
      (lambda (x y) (and (= (numer x) (numer y))
-			(= (denom x) (denom y)))))
+                        (= (denom x) (denom y)))))
 
 ; Complex numbers
 (put 'equ? '(complex complex)
      (lambda (x y) (and (= (imag-part x) (imag-part y))
-			(= (real-part x) (real-part y)))))
-
+                        (= (real-part x) (real-part y)))))
