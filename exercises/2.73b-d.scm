@@ -21,12 +21,12 @@
 		(deriv (multiplicand exp) var))
   (make-product (deriv (multiplier exp) var)
 		(multiplicand exp)))
-  
-(put 'deriv '(+) deriv-sum)
-(put 'deriv '(*) deriv-product)
+
+(put 'deriv '+ deriv-sum)
+(put 'deriv '* deriv-product)
 
 
-c. 
+c.
 (define (deriv-exponent exp var)
   (make-product (make-exponentiation
 		 (make-product (exponent exp)
@@ -34,11 +34,11 @@ c.
 		 (- (exponent exp) 1))
 		(deriv (base exp) var)))
 
-(put 'deriv '(**) deriv-exponent)
+(put 'deriv '** deriv-exponent)
 
 d.
 If we switch to ((get (operator exp) 'deriv) (operands exp) var)
 we would just have to change the put statements:
-(put '(+) 'deriv deriv-sum)
-(put '(*) 'deriv deriv-product)
-(put '(**) 'deriv deriv-exponent)
+(put '+ 'deriv deriv-sum)
+(put '* 'deriv deriv-product)
+(put '** 'deriv deriv-exponent)
