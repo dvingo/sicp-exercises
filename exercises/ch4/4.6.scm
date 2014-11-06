@@ -21,6 +21,3 @@
     (make-lambda (var-list (k-vs exp))
                  (let-body exp))
     (val-list (k-vs exp))))
-
-
-
