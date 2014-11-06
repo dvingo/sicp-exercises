@@ -98,7 +98,7 @@
 (define (lambda-parameters exp) (cadr exp))
 (define (lambda-body exp) (cddr exp))
 (define (make-lambda parameters body)
-  (cons 'lambda (cons parameters body)))
+  (cons 'lambda (list parameters body)))
 (define (if? exp) (tagged-list? exp 'if))
 (define (if-predicate exp) (cadr exp))
 (define (if-consequent exp) (caddr exp))
