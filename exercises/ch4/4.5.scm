@@ -1,0 +1,25 @@
+;; (cond ((assoc ’b ’((a 1) (b 2))) => cadr)
+;;   (else false))
+(define (cond->if exp)
+  (let ((arrow (cadr (cadr exp))))
+    (if (eq? '=> arrow)
+      (expand-arrow-clauses (cond-clauses exp))
+      (expand-clauses (cond-clauses exp)))))
+
+(define (cond-recipient clause) (caddr clause))
+(define (expand-arrow-clauses clauses)
+  (if (null? clauses)
+      'false
+      (let ((first (car clauses))
+            (rest (cdr clauses)))
+        (if (cond-else-clause? first)
+          (if (null? rest)
+              (sequence->exp (cond-actions first))
+              (error "ELSE clause isn't last - COND->IF"
+                     clauses))
+          (let ((test (cond-predicate first))
+               (recipient (cond-recipient first)))
+            (let ((val-of-test test))
+              (make-if val-of-test
+                       (list recipient val-of-test)
+                       (expand-arrow-clauses rest))))))))
